@@ -42,6 +42,9 @@ func (r *userRepository) Create(ctx context.Context, user *entity.User) (uuid.UU
 		user.LastName,
 	).Scan(&id)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return uuid.Nil, nil
+		}
 		return uuid.Nil, fmt.Errorf("create user repository error: %w", err)
 	}
 

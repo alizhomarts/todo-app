@@ -1,9 +1,10 @@
 # 🚀 Todo API (Go + Echo)
 
-![Go](https://img.shields.io/badge/Go-1.22-blue)
+![Go](https://img.shields.io/badge/Go-1.26-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-blue)
 ![JWT](https://img.shields.io/badge/Auth-JWT-green)
 ![Swagger](https://img.shields.io/badge/API-Swagger-orange)
+![Docker](https://img.shields.io/badge/Docker-ready-blue)
 
 Simple and clean REST API for managing todos with JWT authentication.
 
@@ -11,28 +12,30 @@ Simple and clean REST API for managing todos with JWT authentication.
 
 ## ✨ Features
 
-- User registration
-- User login (JWT)
-- Authentication via Bearer Token
-- Create todo
-- Get all todos
-- Get todo by ID
-- Update todo
-- Delete todo
-- Swagger API documentation
-- Structured logging (logrus)
+* User registration
+* User login (JWT)
+* Authentication via Bearer Token
+* Create todo
+* Get all todos
+* Get todo by ID
+* Update todo
+* Delete todo
+* Swagger API documentation
+* Structured logging (logrus)
+* Database migrations (golang-migrate)
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Go**
-- **Echo (web framework)**
-- **PostgreSQL**
-- **pgx**
-- **JWT (golang-jwt)**
-- **Swagger (swaggo)**
-- **Logrus (logging)**
+* **Go**
+* **Echo (web framework)**
+* **PostgreSQL**
+* **pgx**
+* **JWT (golang-jwt)**
+* **Swagger (swaggo)**
+* **Logrus (logging)**
+* **golang-migrate**
 
 ---
 
@@ -56,19 +59,50 @@ todo-app/
 │   ├── dto               # request/response DTO
 │   └── logger            # logging setup
 │
-├── database/migrations   # goose migrations
+├── database/migrations   # database migrations (golang-migrate)
 ├── docs/                 # swagger docs
+├── docker-compose.yml
 └── go.mod
+```
+
+---
 
 ## ⚙️ Setup & Run
 
 ### 1. Clone repository
 
+```bash
 git clone https://github.com/alizhomart/todo-app.git
 cd todo-app
+```
 
-### 2. Create .env
+---
 
+## 🐳 Run with Docker (Recommended)
+
+```bash
+docker compose up --build
+```
+
+### App:
+
+```
+http://localhost:8888
+```
+
+### Swagger:
+
+```
+http://localhost:8888/swagger/index.html
+```
+
+---
+
+## ⚙️ Run locally (without Docker)
+
+### 1. Create `.env`
+
+```env
 APP_PORT=8888
 JWT_SECRET=supersecretkey
 
@@ -77,24 +111,40 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=todo_db
+```
 
-### 3. Run PostgreSQL
+---
+
+### 2. Run PostgreSQL
 
 Make sure PostgreSQL is running locally.
 
-### 4. Run migrations and seeds
+---
 
-goose -dir database/migrations postgres "postgres://postgres:postgres@localhost:5432/todo_db?sslmode=disable" up
-psql "postgres://postgres:postgres@localhost:5432/todo_app?sslmode=disable" -f database/seeds/seeds.sql
+### 3. Run migrations
 
-### 5. Start application
+```bash
+migrate -path database/migrations \
+-database "postgres://postgres:postgres@localhost:5432/todo_db?sslmode=disable" up
+```
 
+---
+
+### 4. Run application
+
+```bash
 go run cmd/app/main.go
+```
+
+---
 
 ## 🌐 Swagger
 
-Open in browser:  
+Open in browser:
+
+```
 http://localhost:8888/swagger/index.html
+```
 
 ---
 
@@ -102,7 +152,9 @@ http://localhost:8888/swagger/index.html
 
 Use Bearer token:
 
+```
 Authorization: Bearer <your_token>
+```
 
 ---
 
@@ -110,34 +162,31 @@ Authorization: Bearer <your_token>
 
 Structured logging using **logrus**:
 
-- Request logs (method, path, status)
-- Error logs
-- Business actions (create / update / delete)
+* Request logs (method, path, status)
+* Error logs
+* Business actions (create / update / delete)
 
 ---
 
 ## 📌 Notes
 
-- UserID is always taken from JWT (secure)
-- Passwords are hashed using bcrypt
-- Clean architecture:
+* UserID is always taken from JWT (secure)
+* Passwords are hashed using bcrypt
+* Clean architecture: handler → service → repository
+* Migrations run automatically on startup (if configured)
 
+---
 
 ## 🚀 Future Improvements
 
-- Refresh tokens
-- Pagination
-- Docker support
-- Unit tests
-- CI/CD
+* Refresh tokens
+* Pagination
+* Unit tests
+* CI/CD pipeline
 
 ---
 
 ## 👨‍💻 Author
 
-**Alizhomart Shukayev**  
+**Alizhomart Shukayev**
 GitHub: https://github.com/alizhomarts
-
-
-
-

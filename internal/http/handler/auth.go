@@ -53,8 +53,6 @@ func (h *AuthHandler) Register(c echo.Context) error {
 		switch {
 		case errors.Is(err, apperror.ErrUserAlreadyExists):
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-		case errors.Is(err, apperror.ErrInvalidCredentials):
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
 		default:
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"error": apperror.InternalServer.Error(),
