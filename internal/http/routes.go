@@ -2,6 +2,8 @@ package http
 
 import (
 	"github.com/labstack/echo/v4"
+	"net/http"
+	jwt "todo-app/internal/auth"
 	"todo-app/internal/http/handler"
 	"todo-app/internal/http/middleware"
 )
@@ -11,24 +13,27 @@ func Routes(
 	authHandler *handler.AuthHandler,
 	userHandler *handler.UserHandler,
 	todoHandler *handler.TodoHandler,
-	jwtSecret string,
+	jwtManager *jwt.JWTManager,
 ) {
 	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{
+		return c.JSON(http.StatusOK, map[string]string{
 			"status": "ok",
 		})
 	})
 
-	e.POST("/api/v1/register", authHandler.Register)
-	e.POST("/api/v1/login", authHandler.Login)
+	api := e.Group("/api/v1")
 
-	users := e.Group("/api/v1/users")
-	users.Use(middleware.AuthMiddleware(jwtSecret))
-	users.GET("/email", userHandler.GetByEmail)
+	api.POST("/register", authHandler.Register)
+	api.POST("/login", authHandler.Login)
+	api.POST("/refresh", authHandler.Refresh)
+
+	users := api.Group("/users")
+	users.Use(middleware.AuthMiddleware(jwtManager))
+	users.GET("/by-email", userHandler.GetByEmail)
 	users.GET("/:id", userHandler.GetByID)
 
-	todos := e.Group("/api/v1/todos")
-	todos.Use(middleware.AuthMiddleware(jwtSecret))
+	todos := api.Group("/todos")
+	todos.Use(middleware.AuthMiddleware(jwtManager))
 	todos.GET("", todoHandler.GetAllByUser)
 	todos.GET("/:id", todoHandler.Get)
 	todos.POST("", todoHandler.Create)

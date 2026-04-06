@@ -104,7 +104,8 @@ http://localhost:8888/swagger/index.html
 
 ```env
 APP_PORT=8888
-JWT_SECRET=supersecretkey
+JWT_ACCESS_SECRET=<your_jwt_access_secret_key>
+JWT_REFRESH_SECRET=<your_jwt_refresh_secret_key>
 
 DB_HOST=localhost
 DB_PORT=5432

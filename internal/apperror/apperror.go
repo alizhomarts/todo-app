@@ -12,7 +12,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 
 	ErrTodoNotFound   = errors.New("todo not found")
-	ErrUserIDRequired = errors.New("user id is required")
+	ErrUserIDRequired = errors.New("user ID is required")
 	ErrTitleRequired  = errors.New("title is required")
 	ErrTodoRequired   = errors.New("todo is nil")
 
@@ -20,4 +20,10 @@ var (
 	InvalidRequestBody = errors.New("invalid request body")
 	InternalServer     = errors.New("internal server error")
 	InvalidID          = errors.New("invalid id")
+
+	ErrRefreshTokenRequired = errors.New("refresh token is required")
+	ErrInvalidRefreshToken  = errors.New("invalid or expired refresh token")
+	ErrMissingAuthHeader    = errors.New("missing authorization header")
+	ErrInvalidAuthHeader    = errors.New("invalid authorization header")
+	ErrInvalidToken         = errors.New("invalid token")
 )

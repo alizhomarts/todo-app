@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/pgxpool"
+	"todo-app/internal/apperror"
 	"todo-app/internal/entity"
 )
 
@@ -67,7 +68,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*entity.
 		&user.CreatedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, apperror.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("get user by email: %w", err)
 	}

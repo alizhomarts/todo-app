@@ -32,8 +32,5 @@ COPY --from=build /todo-app/cmd/app/main /todo-app/main
 # Копируем миграции базы данных
 COPY --from=build /todo-app/database/migrations /todo-app/database/migrations
 
-# Копируем seeds базы данных
-COPY --from=build /todo-app/database/seeds /todo-app/database/seeds
-
 # Устанавливаем команду по умолчанию для запуска приложения
 CMD ["/todo-app/main"]

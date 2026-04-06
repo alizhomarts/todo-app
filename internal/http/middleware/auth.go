@@ -5,48 +5,55 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
+	"todo-app/internal/apperror"
 	"todo-app/internal/auth"
 )
 
-const ContextUserIDKey = "user_id"
+type contextKey string
 
-func AuthMiddleware(jwtSecret string) echo.MiddlewareFunc {
+const ContextUserIDKey contextKey = "user_id"
+
+func AuthMiddleware(jwtManager *auth.JWTManager) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
 			if authHeader == "" {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authorization header"})
+				return c.JSON(http.StatusUnauthorized, map[string]string{
+					"error": apperror.ErrMissingAuthHeader.Error(),
+				})
 			}
 
 			parts := strings.SplitN(authHeader, " ", 2)
 			if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
-					"error": "invalid authorization header",
+					"error": apperror.ErrInvalidAuthHeader.Error(),
 				})
 			}
 
-			claims, err := auth.ParseToken(parts[1], jwtSecret)
+			token := parts[1]
+
+			claims, err := jwtManager.ParseAccessToken(token)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
-					"error": "invalid token",
+					"error": apperror.ErrInvalidToken.Error(),
 				})
 			}
 
 			userID, err := uuid.Parse(claims.UserID)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
-					"error": "invalid user id in token",
+					"error": apperror.ErrInvalidToken.Error(),
 				})
 			}
 
-			c.Set(ContextUserIDKey, userID)
+			c.Set(string(ContextUserIDKey), userID)
 			return next(c)
 		}
 	}
 }
 
 func GetUserID(c echo.Context) (uuid.UUID, bool) {
-	value := c.Get(ContextUserIDKey)
+	value := c.Get(string(ContextUserIDKey))
 	userID, ok := value.(uuid.UUID)
 	return userID, ok
 }

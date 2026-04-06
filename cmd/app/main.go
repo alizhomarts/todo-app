@@ -2,13 +2,14 @@ package main
 
 import (
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/labstack/echo/v4"
 	"github.com/swaggo/echo-swagger"
 	"log"
+	"time"
 	_ "todo-app/docs"
+	jwt "todo-app/internal/auth"
 	"todo-app/internal/config"
 	"todo-app/internal/db"
 	"todo-app/internal/http"
@@ -16,7 +17,7 @@ import (
 	"todo-app/internal/http/middleware"
 	"todo-app/internal/logger"
 	"todo-app/internal/repository"
-	"todo-app/internal/service/auth"
+	authsvc "todo-app/internal/service/auth"
 	"todo-app/internal/service/todo"
 	"todo-app/internal/service/user"
 )
@@ -35,7 +36,7 @@ func main() {
 
 	database := db.NewPostgres(cfg)
 	defer database.Close()
-	runMigrations()
+	runMigrations(cfg)
 
 	e := echo.New()
 
@@ -45,10 +46,18 @@ func main() {
 	// middleware
 	e.Use(middleware.LoggingMiddleware())
 
+	// JWT Manager
+	jwtManager := jwt.NewJWTManager(
+		cfg.JWTAccessSecret,
+		cfg.JWTRefreshSecret,
+		time.Minute*15,
+		time.Hour*24*7,
+	)
+
 	userRepo := repository.NewUserRepository(database)
 	todoRepo := repository.NewTodoRepository(database)
 
-	authSvc := auth.NewService(userRepo, cfg.JWTSecret)
+	authSvc := authsvc.NewService(userRepo, jwtManager)
 	userSvc := user.NewService(userRepo)
 	todoSvc := todo.NewService(todoRepo)
 
@@ -57,17 +66,20 @@ func main() {
 	todoHandler := handler.NewTodoHandler(todoSvc)
 
 	// handlers / routes
-	http.Routes(e, authHandler, userHandler, todoHandler, cfg.JWTSecret)
+	http.Routes(e, authHandler, userHandler, todoHandler, jwtManager)
 
 	logger.Log.Info("server started")
 
 	e.Logger.Fatal(e.Start(":" + cfg.AppPort))
 }
 
-func runMigrations() {
+func runMigrations(cfg *config.Config) {
+	dsn := "postgres://" + cfg.DBUser + ":" + cfg.DBPassword +
+		"@" + cfg.DBHost + ":" + cfg.DBPort + "/" + cfg.DBName + "?sslmode=disable"
+
 	m, err := migrate.New(
 		"file://database/migrations",
-		"postgres://postgres:postgres@db:5432/todo_db?sslmode=disable",
+		dsn,
 	)
 	if err != nil {
 		log.Fatal(err)
