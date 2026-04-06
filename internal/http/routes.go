@@ -19,15 +19,15 @@ func Routes(
 		})
 	})
 
-	e.POST("/register", authHandler.Register)
-	e.POST("/login", authHandler.Login)
+	e.POST("/api/v1/register", authHandler.Register)
+	e.POST("/api/v1/login", authHandler.Login)
 
-	users := e.Group("/users")
+	users := e.Group("/api/v1/users")
 	users.Use(middleware.AuthMiddleware(jwtSecret))
 	users.GET("/email", userHandler.GetByEmail)
 	users.GET("/:id", userHandler.GetByID)
 
-	todos := e.Group("/todos")
+	todos := e.Group("/api/v1/todos")
 	todos.Use(middleware.AuthMiddleware(jwtSecret))
 	todos.GET("", todoHandler.GetAllByUser)
 	todos.GET("/:id", todoHandler.Get)
