@@ -72,7 +72,7 @@ todo-app/
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/alizhomart/todo-app.git
+git clone https://github.com/alizhomarts/todo-app.git
 cd todo-app
 ```
 
@@ -124,10 +124,7 @@ Make sure PostgreSQL is running locally.
 
 ### 3. Run migrations
 
-```bash
-migrate -path database/migrations \
--database "postgres://postgres:postgres@localhost:5432/todo_db?sslmode=disable" up
-```
+Migrations run automatically on application startup.
 
 ---
 

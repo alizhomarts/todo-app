@@ -30,7 +30,7 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=todo_db
       - JWT_ACCESS_SECRET=supersecretkey
-      - JWT_ACCESS_SECRET=supersecretkey123
+      - JWT_REFRESH_SECRET=supersecretkey123
     depends_on:
       db:
         condition: service_healthy
