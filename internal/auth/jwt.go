@@ -76,48 +76,6 @@ func (j *JWTManager) GenerateRefreshToken(userID uuid.UUID) (string, error) {
 	return token.SignedString([]byte(j.refreshSecret))
 }
 
-//func GenerateToken(userID uuid.UUID, secret string) (string, error) {
-//	claims := Claims{
-//		UserID: userID.String(),
-//		RegisteredClaims: jwt.RegisteredClaims{
-//			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-//			IssuedAt:  jwt.NewNumericDate(time.Now()),
-//			NotBefore: jwt.NewNumericDate(time.Now()),
-//			Issuer:    "todo-app",
-//		},
-//	}
-//
-//	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-//
-//	tokenString, err := token.SignedString([]byte(secret))
-//	if err != nil {
-//		return "", fmt.Errorf("sign token: %w", err)
-//	}
-//
-//	return tokenString, nil
-//}
-//
-//func ParseToken(tokenStr string, secret string) (*Claims, error) {
-//	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-//		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-//		if !ok {
-//			return nil, errors.New("unexpected signing method")
-//		}
-//		return []byte(secret), nil
-//	})
-//
-//	if err != nil {
-//		return nil, fmt.Errorf("parse token: %w", err)
-//	}
-//
-//	claims, ok := token.Claims.(*Claims)
-//	if !ok || !token.Valid {
-//		return nil, errors.New("invalid token")
-//	}
-//
-//	return claims, nil
-//}
-
 func (j *JWTManager) ParseAccessToken(tokenStr string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (any, error) {
 		return []byte(j.accessSecret), nil

@@ -177,7 +177,6 @@ Structured logging using **logrus**:
 
 ## 🚀 Future Improvements
 
-* Refresh tokens
 * Pagination
 * Unit tests
 * CI/CD pipeline
